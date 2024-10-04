@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { loadUNetModel } from '$lib/models/uNet';
-	let clothingImage;
+	import type { NamedTensorMap, Tensor } from '@tensorflow/tfjs';
+	let clothingImage: Tensor | Tensor[] | NamedTensorMap;
 	let segmentation;
 
 	async function segmentClothing() {
