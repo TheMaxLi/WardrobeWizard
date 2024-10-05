@@ -4,7 +4,7 @@
 	import TryOn from '$lib/components/TryOn.svelte';
 </script>
 
-<div>
+<div class="flex flex-col">
 	<PoseEstimation />
 	<ClothingSegmentation />
 	<TryOn />

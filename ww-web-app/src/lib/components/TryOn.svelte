@@ -11,4 +11,6 @@
 	}
 </script>
 
-<button on:click={tryOnClothing}>Try On</button>
+<div>
+	<button on:click={tryOnClothing}>Try On</button>
+</div>

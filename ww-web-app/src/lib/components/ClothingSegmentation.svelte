@@ -10,5 +10,7 @@
 	}
 </script>
 
-<input type="file" on:change={(e) => (clothingImage = e.target.files[0])} />
-<button on:click={segmentClothing}>Segment Clothing</button>
+<div>
+	<input type="file" bind:value={clothingImage} />
+	<button on:click={segmentClothing}>Segment Clothing</button>
+</div>
