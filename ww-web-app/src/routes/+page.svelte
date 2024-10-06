@@ -1,11 +1,8 @@
 <script lang="ts">
-	import PoseEstimation from '$lib/components/PoseEstimation.svelte';
-	import ClothingSegmentation from '$lib/components/ClothingSegmentation.svelte';
-	import TryOn from '$lib/components/TryOn.svelte';
+	import BlazePoseApp from '$lib/components/PoseEstimation.svelte';
 </script>
 
 <div class="flex flex-col">
-	<PoseEstimation />
-	<ClothingSegmentation />
-	<TryOn />
+	<h1>BlazePose Body Tracking</h1>
+	<BlazePoseApp />
 </div>
