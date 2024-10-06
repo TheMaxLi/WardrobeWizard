@@ -10,10 +10,8 @@
 	async function estimatePose() {
 		const userImage: PosenetInput = document.querySelector('#photo-preview') as HTMLImageElement;
 		if (userImage) {
-			console.log(userImage);
 			const net = await posenet.load();
 			pose = await net.estimateSinglePose(userImage);
-			console.log(pose);
 		} else {
 			console.log('image not found');
 		}
