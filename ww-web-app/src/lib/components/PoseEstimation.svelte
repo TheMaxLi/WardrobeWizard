@@ -1,59 +1,63 @@
-<script lang="ts">
-	import type { Pose } from '$lib/utils/types';
-	import * as posenet from '@tensorflow-models/posenet';
-	import type { PosenetInput } from '@tensorflow-models/posenet/dist/types';
-	import KeypointsVisualizer from './KeypointsVisualizer.svelte';
-	let file: Blob;
-	let pose: Pose;
-	let photoUrl: any = '';
-
-	async function estimatePose() {
-		const userImage: PosenetInput = document.querySelector('#photo-preview') as HTMLImageElement;
-		if (userImage) {
-			console.log(userImage);
-			const net = await posenet.load();
-			pose = await net.estimateSinglePose(userImage);
-			console.log(pose);
-		} else {
-			console.log('image not found');
-		}
+<script>
+	import { onMount } from 'svelte';
+	import { Pose } from '@mediapipe/pose';
+	import { Camera } from '@mediapipe/camera_utils';
+  
+	let videoElement;
+	let canvasElement;
+	let canvasCtx;
+  
+	onMount(() => {
+	  // Initialize BlazePose
+	  const pose = new Pose({
+		locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+	  });
+  
+	  pose.setOptions({
+		modelComplexity: 1,
+		smoothLandmarks: true,
+		enableSegmentation: false,
+		minDetectionConfidence: 0.5,
+		minTrackingConfidence: 0.5
+	  });
+  
+	  pose.onResults(onResults);
+  
+	  // Start video capture
+	  const camera = new Camera(videoElement, {
+		onFrame: async () => {
+		  await pose.send({ image: videoElement });
+		},
+		width: 640,
+		height: 480
+	  });
+	  camera.start();
+	});
+  
+	function onResults(results) {
+	  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+	  canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+  
+	  if (results.poseLandmarks) {
+		// Draw landmarks here
+		results.poseLandmarks.forEach((landmark) => {
+		  canvasCtx.beginPath();
+		  canvasCtx.arc(landmark.x * canvasElement.width, landmark.y * canvasElement.height, 5, 0, 2 * Math.PI);
+		  canvasCtx.fillStyle = "red";
+		  canvasCtx.fill();
+		});
+	  }
 	}
-
-	$: if (file) {
-		const reader = new FileReader();
-		reader.onload = (e) => {
-			// @ts-ignore
-			photoUrl = e.target.result;
-		};
-		reader.readAsDataURL(file);
+  </script>
+  
+  <video bind:this={videoElement} class="input_video"></video>
+  <canvas bind:this={canvasElement} width="640" height="480"></canvas>
+  
+  <style>
+	.input_video {
+	  display: none;
 	}
-	// @ts-ignore
-	async function handlePhotoUpload(event) {
-		file = event.target.files[0];
-		setTimeout(async () => {
-			await estimatePose();
-		}, 1000);
+	canvas {
+	  border: 1px solid black;
 	}
-</script>
-
-<div>
-	<label for="photo-upload">Upload a photo:</label>
-	<input id="photo-upload" type="file" accept="image/*" on:change={handlePhotoUpload} />
-	<div>
-		{#if photoUrl}
-			<!-- svelte-ignore a11y-img-redundant-alt -->
-			<img src={photoUrl} alt="Uploaded photo" id="photo-preview" />
-		{/if}
-
-		{#if pose}
-			<KeypointsVisualizer {pose} />
-		{/if}
-	</div>
-</div>
-
-<style>
-	img {
-		height: 500px;
-		width: 500px;
-	}
-</style>
+  </style>
