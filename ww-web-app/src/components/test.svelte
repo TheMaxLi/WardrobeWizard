@@ -3,17 +3,19 @@
 	import posePkg from '@mediapipe/pose';
 	import cameraPkg from '@mediapipe/camera_utils';
 	import type { Results } from '@mediapipe/pose';
+	import * as tf from '@tensorflow/tfjs';
+	import * as deeplab from '@tensorflow-models/deeplab';
 	const { Camera } = cameraPkg;
 	const { Pose } = posePkg;
+
+	// Add state for clothing image URL
+	export let clothingImageUrl: string = '';
 
 	let videoElement: HTMLVideoElement;
 	let canvasElement: HTMLCanvasElement;
 	let canvasCtx: CanvasRenderingContext2D | null = null;
 	let clothingImage: HTMLImageElement;
 	let isClothingLoaded = false;
-
-	// Add state for clothing image URL
-	export let clothingImageUrl: string = '';
 
 	// Initialize clothing image
 	function initClothing() {
@@ -55,7 +57,10 @@
 		ctx: CanvasRenderingContext2D,
 		position: ReturnType<typeof getClothingPosition>
 	) {
-		if (!isClothingLoaded) return;
+		if (!isClothingLoaded) {
+			console.log('Clothing is not WORKING');
+			return;
+		}
 
 		const clothingAspectRatio = clothingImage.width / clothingImage.height;
 		const scaledClothingWidth = position.shoulderWidth * 1.2; // Add padding
@@ -104,10 +109,61 @@
 		}
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		// Initialize clothing image
 		if (clothingImageUrl) {
 			initClothing();
+			const net = await deeplab.load({base: 'ade20k', modelUrl: 'https://tfhub.dev/tensorflow/tfjs-model/deeplab/pascal/1/default/1/model.json?tfjs-format=file', quantizationBytes: 2});
+
+			const segmentation = await net.segment(clothingImage);
+
+			// Get the mask and dimensions
+			const mask = segmentation.segmentationMap;
+			const width = segmentation.width;
+			const height = segmentation.height;
+			const legend = segmentation.legend;
+
+			canvasElement.width = width;
+			canvasElement.height = height;
+			const ctx = canvasElement.getContext('2d')
+
+			if (!ctx) {
+				return;
+			}
+			ctx.drawImage(clothingImage, 0, 0, width, height);
+
+			const imageData = ctx.getImageData(0, 0, width, height);
+			const data = imageData.data
+
+			console.log(mask)
+			// Modify the pixels based on the segmentation mask
+			for (let i = 0; i < data.length; i += 4) {
+				// Extract pixel color values
+				const red = data[i];
+				const green = data[i + 1];
+				const blue = data[i + 2];
+
+				// Get corresponding mask value (from 0 to max class index)
+				const maskValue = mask[i];
+
+				// Check if it's background or a desired object (assume 0 is background)
+				if (maskValue === 0) { // Background
+					// Make sure it's truly white to avoid affecting the shirt
+					if (red > 200 && green > 200 && blue > 200) { 
+						data[i + 3] = 0; // Set alpha to 0 (transparent) only for white pixels in the background
+					}
+				} else {
+					// Preserve the pixel's alpha value fully if it's part of the object (like the black shirt)
+					data[i + 3] = 255; // Fully opaque
+				}
+			}
+
+			// Put the modified data back onto the canvas
+			ctx.putImageData(imageData, 0, 0);
+
+			// Get the output image URL from the canvas
+			clothingImageUrl = canvasElement.toDataURL();
+			initClothing()
 		}
 
 		// Get canvas context
