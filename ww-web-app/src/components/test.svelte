@@ -3,8 +3,8 @@
 	import posePkg from '@mediapipe/pose';
 	import cameraPkg from '@mediapipe/camera_utils';
 	import type { Results } from '@mediapipe/pose';
-	import * as tf from '@tensorflow/tfjs';
 	import * as deeplab from '@tensorflow-models/deeplab';
+	import * as tf from '@tensorflow/tfjs';
 	const { Camera } = cameraPkg;
 	const { Pose } = posePkg;
 
@@ -109,6 +109,44 @@
 		}
 	}
 
+	function cropImageToNonTransparentPixels(imageData: ImageData) {
+		const data = imageData.data;
+		let left = imageData.width, right = 0, top = imageData.height, bottom = 0;
+
+		// Find the bounding box of non-transparent pixels
+		for (let y = 0; y < imageData.height; y++) {
+			for (let x = 0; x < imageData.width; x++) {
+				const index = (y * imageData.width + x) * 4;
+				if (data[index + 3] > 0) { // Check alpha value
+					if (x < left) left = x;
+					if (x > right) right = x;
+					if (y < top) top = y;
+					if (y > bottom) bottom = y;
+				}
+			}
+		}
+
+		// Crop dimensions
+		const width = right - left + 1;
+		const height = bottom - top + 1;
+
+		// Create a new canvas to draw the cropped image
+		const croppedCanvas = document.createElement('canvas');
+		croppedCanvas.width = width;
+		croppedCanvas.height = height;
+		const croppedCtx = croppedCanvas.getContext('2d');
+		if (croppedCtx) {
+			// Draw the cropped image
+			croppedCtx.drawImage(
+				canvasElement,
+				left, top, width, height,
+				0, 0, width, height
+			);
+		}
+
+		return croppedCanvas.toDataURL(); // Return the cropped image as a data URL
+	}
+
 	onMount(async () => {
 		// Initialize clothing image
 		if (clothingImageUrl) {
@@ -133,9 +171,9 @@
 			ctx.drawImage(clothingImage, 0, 0, width, height);
 
 			const imageData = ctx.getImageData(0, 0, width, height);
-			const data = imageData.data
+			const data = imageData.data;
+			initClothing()
 
-			console.log(mask)
 			// Modify the pixels based on the segmentation mask
 			for (let i = 0; i < data.length; i += 4) {
 				// Extract pixel color values
@@ -164,6 +202,10 @@
 			// Get the output image URL from the canvas
 			clothingImageUrl = canvasElement.toDataURL();
 			initClothing()
+
+			const croppedImageUrl = cropImageToNonTransparentPixels(imageData);
+			clothingImageUrl = croppedImageUrl;
+			initClothing();
 		}
 
 		// Get canvas context
