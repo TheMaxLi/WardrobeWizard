@@ -63,7 +63,7 @@
 		}
 
 		const clothingAspectRatio = clothingImage.width / clothingImage.height;
-		const scaledClothingWidth = position.shoulderWidth * 1.2; // Add padding
+		const scaledClothingWidth = position.shoulderWidth * 2; // Add padding
 		const scaledClothingHeight = scaledClothingWidth / clothingAspectRatio;
 
 		const clothingX = position.shoulderCenter.x - scaledClothingWidth / 2;
