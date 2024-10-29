@@ -1,8 +1,8 @@
 <script lang="ts">
-	import PoseEstimationTensor from '$lib/components/PoseEstimationTensor.svelte';
+	import Header from '../components/Header.svelte';
+	import SideBar from '../components/SideBar.svelte';
 </script>
 
-<div class="flex flex-col">
-	<h1>BlazePose Body Tracking</h1>
-	<PoseEstimationTensor />
+<div class="flex flex-col ">
+	<Header />
 </div>
