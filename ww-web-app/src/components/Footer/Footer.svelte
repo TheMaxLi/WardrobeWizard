@@ -13,7 +13,7 @@
 		</p>
 		<button
 			class="rounded-sm text-xs bg-cyan-30 border border-[#404C56] text-center px-6 text-[#404C56]"
-			>insert email address</button
-		>
+			>insert email address
+		</button>
 	</div>
 </div>

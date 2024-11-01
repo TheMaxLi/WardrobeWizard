@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ArrowDownSvg from '../svg/ArrowDownSVG.svelte';
-	import WizardHatSvg from '../svg/WizardHatSvg.svelte';
 	import SideBar from './SideBar.svelte';
+	import WWLogo from '../../../public/static/WWLogo.gif';
 </script>
 
 <div class="flex flex-col mb-20">
@@ -10,7 +10,7 @@
 		<span class="text-white text-4xl font-Georgia">WW</span>
 	</div>
 	<div class="flex flex-col justify-center items-center my-8 pt-14">
-		<WizardHatSvg className="w-16 h-16 md:w-24 md:h-24" />
+		<img class="w-16 h-16 md:w-24 md:h-24" src={WWLogo} alt="wwLogo" />
 		<p
 			class="text-white font-Georgia text-2xl md:text-4xl lg:text-5xl w-56 md:w-96 text-center my-2"
 		>
