@@ -16,6 +16,16 @@
 	let canvasCtx: CanvasRenderingContext2D | null = null;
 	let clothingImage: HTMLImageElement;
 	let isClothingLoaded = false;
+	let isCentered = false;
+
+	interface Landmark {
+		x: number;
+		y: number;
+		z: number;
+		visibility?: number;
+	}
+	type PoseLandmarks = Landmark[];
+
 
 	// Initialize clothing image
 	function initClothing() {
@@ -63,7 +73,7 @@
 		}
 
 		const clothingAspectRatio = clothingImage.width / clothingImage.height;
-		const scaledClothingWidth = position.shoulderWidth * 2; // Add padding
+		const scaledClothingWidth = position.shoulderWidth * 1.8; // Add padding
 		const scaledClothingHeight = scaledClothingWidth / clothingAspectRatio;
 
 		const clothingX = position.shoulderCenter.x - scaledClothingWidth / 2;
@@ -75,8 +85,27 @@
 		ctx.globalAlpha = 1.0;
 	}
 
+	function isFacingForward(landmarks: PoseLandmarks) {
+		// Define indices for left and right shoulders and hips
+		const leftShoulder = landmarks[11];
+		const rightShoulder = landmarks[12];
+		
+		// Thresholds for determining alignment
+		const xThreshold = 0.35; // Adjust based on sensitivity needed
+		
+		// Check x alignment for shoulders and hips
+		const shouldersAligned = Math.abs(leftShoulder.x - rightShoulder.x) > xThreshold;
+				
+		// console.log("Shoulders X Difference:", Math.abs(leftShoulder.x - rightShoulder.x));
+		// Return true if both shoulders and hips are aligned and consistent in depth
+		return shouldersAligned;
+	}
+
 	// Process MediaPipe results
-	function onResults(results: Results) {
+	 async function onResults(results: Results) {
+		// Example usage in your code
+		isCentered = isFacingForward(results.poseLandmarks)
+
 		if (!canvasCtx || !canvasElement) return;
 
 		// Clear canvas
