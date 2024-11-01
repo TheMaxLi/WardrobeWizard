@@ -111,13 +111,17 @@
 
 	function cropImageToNonTransparentPixels(imageData: ImageData) {
 		const data = imageData.data;
-		let left = imageData.width, right = 0, top = imageData.height, bottom = 0;
+		let left = imageData.width,
+			right = 0,
+			top = imageData.height,
+			bottom = 0;
 
 		// Find the bounding box of non-transparent pixels
 		for (let y = 0; y < imageData.height; y++) {
 			for (let x = 0; x < imageData.width; x++) {
 				const index = (y * imageData.width + x) * 4;
-				if (data[index + 3] > 0) { // Check alpha value
+				if (data[index + 3] > 0) {
+					// Check alpha value
 					if (x < left) left = x;
 					if (x > right) right = x;
 					if (y < top) top = y;
@@ -137,11 +141,7 @@
 		const croppedCtx = croppedCanvas.getContext('2d');
 		if (croppedCtx) {
 			// Draw the cropped image
-			croppedCtx.drawImage(
-				canvasElement,
-				left, top, width, height,
-				0, 0, width, height
-			);
+			croppedCtx.drawImage(canvasElement, left, top, width, height, 0, 0, width, height);
 		}
 
 		return croppedCanvas.toDataURL(); // Return the cropped image as a data URL
@@ -151,7 +151,12 @@
 		// Initialize clothing image
 		if (clothingImageUrl) {
 			initClothing();
-			const net = await deeplab.load({base: 'ade20k', modelUrl: 'https://tfhub.dev/tensorflow/tfjs-model/deeplab/pascal/1/default/1/model.json?tfjs-format=file', quantizationBytes: 2});
+			const net = await deeplab.load({
+				base: 'ade20k',
+				modelUrl:
+					'https://tfhub.dev/tensorflow/tfjs-model/deeplab/pascal/1/default/1/model.json?tfjs-format=file',
+				quantizationBytes: 2
+			});
 
 			const segmentation = await net.segment(clothingImage);
 
@@ -163,7 +168,7 @@
 
 			canvasElement.width = width;
 			canvasElement.height = height;
-			const ctx = canvasElement.getContext('2d')
+			const ctx = canvasElement.getContext('2d');
 
 			if (!ctx) {
 				return;
@@ -172,7 +177,7 @@
 
 			const imageData = ctx.getImageData(0, 0, width, height);
 			const data = imageData.data;
-			initClothing()
+			initClothing();
 
 			// Modify the pixels based on the segmentation mask
 			for (let i = 0; i < data.length; i += 4) {
@@ -185,9 +190,10 @@
 				const maskValue = mask[i];
 
 				// Check if it's background or a desired object (assume 0 is background)
-				if (maskValue === 0) { // Background
+				if (maskValue === 0) {
+					// Background
 					// Make sure it's truly white to avoid affecting the shirt
-					if (red > 200 && green > 200 && blue > 200) { 
+					if (red > 200 && green > 200 && blue > 200) {
 						data[i + 3] = 0; // Set alpha to 0 (transparent) only for white pixels in the background
 					}
 				} else {
@@ -201,7 +207,7 @@
 
 			// Get the output image URL from the canvas
 			clothingImageUrl = canvasElement.toDataURL();
-			initClothing()
+			initClothing();
 
 			const croppedImageUrl = cropImageToNonTransparentPixels(imageData);
 			clothingImageUrl = croppedImageUrl;
@@ -242,14 +248,7 @@
 	});
 </script>
 
-<video bind:this={videoElement} class="input_video" autoplay></video>
-<canvas bind:this={canvasElement} width="640" height="480"></canvas>
-
-<style>
-	.input_video {
-		display: none;
-	}
-	canvas {
-		border: 1px solid black;
-	}
-</style>
+<div class="rounded-md">
+	<video bind:this={videoElement} class="hidden" autoplay></video>
+	<canvas bind:this={canvasElement} width="640" height="480" class="border border-black"></canvas>
+</div>
