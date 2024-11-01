@@ -19,16 +19,15 @@
 	];
 </script>
 
-<div class="w-full max-w-6xl mx-auto p-6">
-	<h1 class="text-3xl font-serif text-center mb-8">How the magic starts...</h1>
-
+<div class="w-full max-w-6xl mx-auto p-3">
+	<h1 class="text-2xl font-serif text-center mb-8">How the magic starts...</h1>
 	<div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
 		{#each steps as step (step.id)}
-			<div class="rounded-lg p-4">
+			<div class="rounded-lg p-2">
 				<div class="aspect-square w-full bg-gray-200 mb-4 rounded-lg"></div>
-				<div class="space-x-2 flex">
+				<div class="space-x-2 flex items-start justify-start">
 					<div class="text-lg font-medium">{step.id}.</div>
-					<p class="text-gray-600 break-words">{step.text}</p>
+					<p class="text-gray-600 text-xs break-words">{step.text}</p>
 				</div>
 			</div>
 		{/each}

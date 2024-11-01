@@ -22,8 +22,8 @@
 			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
 			labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud. meow
 		</p>
-		<div class="flex justify-center items-center mt-4">
-			<button class="rounded-lg bg-[#FFF8E8] flex px-5 py-2 items-center justify-between">
+		<div class="flex justify-center items-center mt-6">
+			<button class="rounded-md bg-[#FFF8E8] flex px-5 py-1 items-center justify-between">
 				<p class="text-[#4C5482] font-Georgia text-base md:text-lg">Let's get started</p>
 				<ArrowDownSvg className="text-[#4C5482] w-5 h-5 md:w-6 md:h-6" />
 			</button>

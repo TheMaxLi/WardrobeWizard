@@ -4,7 +4,8 @@ module.exports = {
 	theme: {
 		extend: {
 			colors: {
-				'white-10': 'rgba(255, 255, 255, 0.1)' // 10% white
+				'white-10': 'rgba(255, 255, 255, 0.1)', // 10% white
+				'cyan-30': 'rgb(64,76,86, 0.3)'
 			},
 			fontFamily: {
 				Georgia: ['Georgia', 'sans-serif'],
