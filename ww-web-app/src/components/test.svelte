@@ -250,5 +250,5 @@
 
 <div class="rounded-md">
 	<video bind:this={videoElement} class="hidden" autoplay></video>
-	<canvas bind:this={canvasElement} width="640" height="480" class="border border-black"></canvas>
+	<canvas bind:this={canvasElement} class="border border-black w-full"></canvas>
 </div>
